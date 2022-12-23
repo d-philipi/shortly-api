@@ -3,12 +3,13 @@ import { nanoid } from 'nanoid'
 
 export async function shorten(req, res) {
     const { url } = req.body;
+    const { user } = req.user; 
     const shortUrl = nanoid();
 
     try{
         await DB.query(
-            "INSERT INTO urls ( url, short_url ) VALUES ( $1, $2 )",
-            [ url, shortUrl ]
+            "INSERT INTO urls ( url, short_url, user_id ) VALUES ( $1, $2, $3 )",
+            [ url, shortUrl, user.id ]
         );
 
         res.send({ shortUrl }).Status(201);
@@ -55,5 +56,16 @@ export async function findShortUrl(req, res) {
 }
 
 export async function deleteUrl(req, res) {
-    
+    const { id } = req.params;
+
+    try{
+        await DB.query(
+          "DELETE * FROM urls WHERE urls.id = $1",
+          [ id ]
+        );
+
+        res.sendStatus(200);
+    }catch{
+         return res.sendStatus(500);
+    }
 }

@@ -12,3 +12,22 @@ export async function urlValidation(req, res, next) {
 
   next();
 }
+
+export async function deleteUrlValidation(req, res, next) {
+  const user = req.user;
+  const { id } = req.params;
+  const urlExist = await DB.query(
+    "SELECT * FROM urls WHERE urls.id = $1",
+    [ id ] 
+  );
+
+  if(!urlExist){
+    return res.sendStatus(404);
+  };
+
+  if(urlExist.user_id !== user.id){
+    return res.sendStatus(204);
+  }
+  
+  next();
+}

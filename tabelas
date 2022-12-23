@@ -1,5 +1,25 @@
-users
+users: {
+    id,
+    name,
+    email,
+    password
+}
 
-sessions
+sessions: {
+    id,
+    user_id,
+    token
+}
 
-urls
+urls: {
+    id ,
+    url,
+    short_url,
+    user_id
+}
+
+visits: {
+    id,
+    short_url,
+    visit
+}

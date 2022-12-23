@@ -22,8 +22,11 @@ export async function authValidation(req, res, next) {
       [ userId ]
     );
 
-    req.user = user;
+    if(!user){
+      return res.sendStatus(404);
+    }
 
+    req.user = user;
   } catch (err) {
     return res.sendStatus(500);
   }
