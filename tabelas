@@ -1,29 +1,36 @@
-users: {
-    id,
-    name,
-    email,
-    password
-}
+/*
+CREATE TABLE "users" (
+    "id" SERIAL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "email" TEXT UNIQUE NOT NULL,
+    "password" TEXT NOT NULL
+);
 
-sessions: {
-    id,
-    user_id,
-    token
-}
+CREATE TABLE "sessions" (
+    "id" SERIAL PRIMARY KEY,
+    "user_id" INTEGER NOT NULL REFERENCES "users"("id"),
+    "token" TEXT NOT NULL
+);
 
-urls: {
-    id ,
-    url,
-    short_url,
-    user_id
-}
+CREATE TABLE "urls" (
+    "id" SERIAL PRIMARY KEY,
+    "url" TEXT NOT NULL,
+    "short_url" TEXT UNIQUE NOT NULL,
+    "user_id" INTEGER NOT NULL REFERENCES "users"("id")
+);
 
-visits: {
-    id,
-    short_url,
-    user_id,
-    visit
-}
+CREATE TABLE "visits" (
+    "id" SERIAL PRIMARY KEY,
+    "short_url" TEXT NOT NULL,
+    "user_id" INTEGER NOT NULL REFERENCES "users"("id"),
+    "visit" INTEGER DEFAULT 0
+);
+
+CREATE TABLE "links" (
+    "id" SERIAL PRIMARY KEY,
+    "user_id" TEXT NOT NULL,
+    "qtd_link" INTEGER DEFAULT 0
+);
 
 informações que ele quer no user/me:{
     id: id do usuário logado,
@@ -45,4 +52,11 @@ informações que ele quer no user/me:{
     ]
 }
 
-SELECT users.id, users.name,
+
+Result do user (resultUser) vai fazer um select buscando id do usuário, nome  e fazer um join com
+a contagem total de visitas a partir dos links vinculados ao user_id.
+
+Result das shorts (resultShort) vai fazer um select buscando id da url, short_url, url e fazer um join
+com a contagem total de visitas em cada link.
+
+*/

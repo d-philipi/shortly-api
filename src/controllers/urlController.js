@@ -12,6 +12,11 @@ export async function shorten(req, res) {
             [ url, shortUrl, user.id ]
         );
 
+        await DB.query(
+            "INSERT INTO links ( user_id, qtd_link ) VALUES ( $1, $2 )",
+            [ user.id, 1 ]
+        );
+
         res.send({ shortUrl }).Status(201);
     }catch{
         return res.sendStatus(500);

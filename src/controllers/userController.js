@@ -13,6 +13,11 @@ export async function signUp(req, res){
             [user.name, user.email, hashPassword]
         );
 
+        await DB.query(
+            "INSERT INTO links ( user_id ) VALUES ( $1 )",
+            [ user.id ]
+        );
+
         res.sendStatus(201);
       } catch (err) {
         res.sendStatus(500);
@@ -65,6 +70,10 @@ export async function userMe(req, res) {
         ...resultUser,
         shortenedUrls: resultShort.rows
     }
+
+    res.send( objectUser ).Status(200);
+}
+
 /*
 Result do user (resultUser) vai fazer um select buscando id do usuário, nome  e fazer um join com
 a contagem total de visitas a partir dos links vinculados ao user_id.
@@ -72,5 +81,3 @@ a contagem total de visitas a partir dos links vinculados ao user_id.
 Result das shorts (resultShort) vai fazer um select buscando id da url, short_url, url e fazer um join
 com a contagem total de visitas em cada link.
 */
-    res.send( objectUser ).Status(200);
-}
