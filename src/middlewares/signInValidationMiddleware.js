@@ -5,8 +5,8 @@ import { signInSchema } from "../models/userModel.js";
 export async function signInValidation(req, res, next) {
     const user = req.body;
     const validation = signInSchema.validate(user, { abortEarly: false });
-    const userExiste = await DB.query(
-        "SELECT * FROM users WHERE users.email = $1",
+    const userExist = await DB.query(
+        'SELECT * FROM users WHERE email = $1',
         [user.email]
     );
 
@@ -16,17 +16,17 @@ export async function signInValidation(req, res, next) {
         return;
     }
 
-    if(!userExiste){
+    if(!userExist.rows[0]){
         return res.status(401).send({ message: "Email ou senha incorretos!" });
     }
 
-    const passwordOk = bcrypt.compareSync(user.password, userExiste.password);
+    const passwordOk = bcrypt.compareSync(user.password, userExist.rows[0].password);
 
     if(!passwordOk){
         return res.status(401).send({ message: "Email ou senha incorretos!" });
     }
 
-    req.userLogado = userExiste;
+    req.userLogado = userExist.rows[0];
 
     next();
 }

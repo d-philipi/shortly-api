@@ -2,62 +2,64 @@ import { DB } from "../database/db.js";
 import { nanoid } from 'nanoid'
 
 export async function shorten(req, res) {
-    const { url } = req.body;
-    const { user } = req.user; 
+    const { url }  = req.body;
+    const user = req.user; 
     const shortUrl = nanoid();
 
     try{
         await DB.query(
-            "INSERT INTO urls ( url, short_url, user_id ) VALUES ( $1, $2, $3 )",
+            'INSERT INTO urls ( url, short_url, user_id ) VALUES ( $1, $2, $3 )',
             [ url, shortUrl, user.id ]
         );
 
         await DB.query(
-            "INSERT INTO links ( user_id, qtd_link ) VALUES ( $1, $2 )",
+            'INSERT INTO links ( user_id, qtd_link ) VALUES ( $1, $2 )',
             [ user.id, 1 ]
         );
 
-        res.send({ shortUrl }).Status(201);
     }catch{
         return res.sendStatus(500);
     }
+
+    res.send({ shortUrl }).status(201);
 }
 
 export async function findUrl(req, res) {
     const { id } = req.params;
     const url = await DB.query(
-        "SELECT * FROM urls WHERE urls.id = $1",
+        'SELECT * FROM urls WHERE id = $1',
         [ id ]
     );
 
-    if(!url){
+    if(!url.rows[0]){
         return res.sendStatus(500);
     }
 
-    res.send(url).Status(200);
+    res.send(url.rows[0]).status(200);
 }
 
 export async function findShortUrl(req, res) {
-    const { shorten } = req.params;
+    const { shortUrl } = req.params;
     const urlExist = await DB.query(
-        "SELECT * FROM urls WHERE urls.short_url = $1",
-        [ shorten ]
+        'SELECT * FROM urls WHERE short_url = $1',
+        [ shortUrl ]
     );
 
-    if(!urlExist){
+    if(!urlExist.rows[0]){
         return res.sendStatus(404);
     }
 
     try{
         await DB.query(
-            "INSERT INTO visits ( short_url, visit ) VALUES ( $1, $2 )",
-            [ shortUrl, 1 ]
+            'INSERT INTO visits ( short_url, user_id, visit ) VALUES ( $1, $2, $3 )',
+            [ shortUrl, urlExist.rows[0].user_id, 1 ]
         );
 
-        res.redirect( urlExist.url );
     }catch{
         return res.sendStatus(500);
     }
+
+    res.redirect( urlExist.rows[0].url );
 }
 
 export async function deleteUrl(req, res) {
@@ -65,12 +67,13 @@ export async function deleteUrl(req, res) {
 
     try{
         await DB.query(
-          "DELETE * FROM urls WHERE urls.id = $1",
+          'DELETE FROM urls WHERE id = $1',
           [ id ]
         );
 
-        res.sendStatus(200);
     }catch{
-         return res.sendStatus(500);
+         return res.send({ message: "Deu erro aqui"}).status(500);
     }
+
+    res.sendStatus(200);
 }

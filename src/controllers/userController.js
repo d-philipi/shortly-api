@@ -13,33 +13,33 @@ export async function signUp(req, res){
             [user.name, user.email, hashPassword]
         );
 
-        await DB.query(
-            "INSERT INTO links ( user_id ) VALUES ( $1 )",
-            [ user.id ]
-        );
-
         res.sendStatus(201);
       } catch (err) {
-        res.sendStatus(500);
+        res.send({ message: "Deu erro aqui!" }).Status(500);
       }
 }
 
 export async function signIn(req, res){
 
-    const userExiste = req.userLogado;
+    const userExist = req.userLogado;
     const token = uuid();
 
     try {
 
         await DB.query(
-            "INSERT INTO sessions (token, userId) VALUE ( $1, $2 )",
-            [ token, userExiste._id ]
+            "INSERT INTO sessions (token, user_id) VALUES ( $1, $2 )",
+            [ token, userExist.id ]
         );
 
-        res.send({ token }).Status(200);
+        await DB.query(
+            "INSERT INTO links ( user_id ) VALUES ( $1 )",
+            [ userExist.id ]
+        );
     } catch (err) {
         res.sendStatus(500);
     }
+
+    res.send({ token }).status(200);
 }
 
 export async function userMe(req, res) {
@@ -51,33 +51,27 @@ export async function userMe(req, res) {
             JOIN visits
             ON visits.user_id = users.id
             WHERE users.id = $1
+            GROUP BY users.id
         `,
         [ user.id ]
     );
 
     const resultShort = await DB.query(
-        `SELECT urls.id, urls.short_url, url.url, COUNT( visit ) AS "visitCount" 
+        `SELECT urls.id, urls.short_url, urls.url, COUNT( visit ) AS "visitCount" 
             FROM urls 
             JOIN visits 
-            ON urls.short_url = visits.short_url
+            ON visits.user_id = urls.user_id
             WHERE urls.user_id = $1
-            GROUP BY urls.short_url
+            GROUP BY urls.id
         `,
         [ user.id ]
     );
-
+    
     const objectUser = {
-        ...resultUser,
+        ...resultUser.rows[0],
         shortenedUrls: resultShort.rows
     }
+    
 
-    res.send( objectUser ).Status(200);
+    res.send( objectUser ).status(200);
 }
-
-/*
-Result do user (resultUser) vai fazer um select buscando id do usuário, nome  e fazer um join com
-a contagem total de visitas a partir dos links vinculados ao user_id.
-
-Result das shorts (resultShort) vai fazer um select buscando id da url, short_url, url e fazer um join
-com a contagem total de visitas em cada link.
-*/

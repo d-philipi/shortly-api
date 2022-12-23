@@ -10,6 +10,6 @@ const router = Router();
 
 router.post("/sign-up", signUpValidation, signUp);
 router.post("/sign-in", signInValidation, signIn);
-router.get("users/me", authValidation, userMe);
+router.get("/users/me", authValidation, userMe);
 
 export default router;

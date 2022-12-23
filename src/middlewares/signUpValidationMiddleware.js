@@ -7,6 +7,7 @@ export async function signUpValidation(req, res, next) {
 
     if (user.password !== user.confirmPassword) {
         res.status(422).send({ message: "Senhas não correspondentes" });
+        return;
     }
 
     if (validation.error) {
@@ -15,13 +16,13 @@ export async function signUpValidation(req, res, next) {
         return;
     }
 
-    const userExiste = await DB.query(
+    const userExist = await DB.query(
         "SELECT * FROM users WHERE users.email = $1",
         [user.email]
     );
 
-    if(userExiste){
-        return res.status(409).send({ message: "Usuário já existente" });
+    if(userExist.rows.length > 0){
+        return res.status(409).send({ message: "Usuário existente!" });
     }
 
     next();

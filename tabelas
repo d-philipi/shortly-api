@@ -28,7 +28,7 @@ CREATE TABLE "visits" (
 
 CREATE TABLE "links" (
     "id" SERIAL PRIMARY KEY,
-    "user_id" TEXT NOT NULL,
+    "user_id" INTEGER NOT NULL REFERENCES "users"("id"),
     "qtd_link" INTEGER DEFAULT 0
 );
 

@@ -1,4 +1,5 @@
 import { urlSchema } from "../models/urlModel.js";
+import { DB } from "../database/db.js";
 
 export async function urlValidation(req, res, next) {
   const url = req.body;
@@ -21,11 +22,11 @@ export async function deleteUrlValidation(req, res, next) {
     [ id ] 
   );
 
-  if(!urlExist){
+  if(!urlExist.rows[0]){
     return res.sendStatus(404);
   };
 
-  if(urlExist.user_id !== user.id){
+  if(urlExist.rows[0].user_id !== user.id){
     return res.sendStatus(204);
   }
   
