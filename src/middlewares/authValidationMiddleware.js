@@ -9,12 +9,18 @@ export async function authValidation(req, res, next) {
   }
 
   try {
-    const session = await sessionsCollection.findOne({ token });
-    const user = await usersCollection.findOne({ _id: session?.userId });
 
-    if (!user) {
-      return res.sendStatus(404);
-    }
+    const session = await DB.query(
+      "SELECT * FROM sessions WHERE sessions.token = $1",
+      [ token ]
+    );
+
+    const userId = session?.userId;
+
+    const user = await DB.query(
+      'SELECT * FROM users WHERE users.id = $1',
+      [ userId ]
+    );
 
     req.user = user;
 
