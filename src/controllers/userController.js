@@ -38,5 +38,39 @@ export async function signIn(req, res){
 }
 
 export async function userMe(req, res) {
-    
+    const user = req.user;
+
+    const resultUser = await DB.query(
+        `SELECT users.id, users.name, COUNT( visit ) AS "visitCount" 
+            FROM users
+            JOIN visits
+            ON visits.user_id = users.id
+            WHERE users.id = $1
+        `,
+        [ user.id ]
+    );
+
+    const resultShort = await DB.query(
+        `SELECT urls.id, urls.short_url, url.url, COUNT( visit ) AS "visitCount" 
+            FROM urls 
+            JOIN visits 
+            ON urls.short_url = visits.short_url
+            WHERE urls.user_id = $1
+            GROUP BY urls.short_url
+        `,
+        [ user.id ]
+    );
+
+    const objectUser = {
+        ...resultUser,
+        shortenedUrls: resultShort.rows
+    }
+/*
+Result do user (resultUser) vai fazer um select buscando id do usuário, nome  e fazer um join com
+a contagem total de visitas a partir dos links vinculados ao user_id.
+
+Result das shorts (resultShort) vai fazer um select buscando id da url, short_url, url e fazer um join
+com a contagem total de visitas em cada link.
+*/
+    res.send( objectUser ).Status(200);
 }

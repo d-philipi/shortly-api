@@ -21,5 +21,28 @@ urls: {
 visits: {
     id,
     short_url,
+    user_id,
     visit
 }
+
+informações que ele quer no user/me:{
+    id: id do usuário logado,
+    name: nome do usuário logado,
+    visitCount: soma de todas as visitas em todos os links,
+    shortenedUrls: todas as urls encurtadas do usuário [
+        {
+            id: id da url encurtada,
+            shortUrl: url encurtada,
+            url: url original,
+            visitCount: soma de visitas no link
+        }
+        {
+            id: id da url encurtada,
+            shortUrl: url encurtada,
+            url: url original,
+            visitCount: soma de visitas no link
+        }
+    ]
+}
+
+SELECT users.id, users.name,
